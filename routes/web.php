@@ -4,6 +4,8 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\MembreController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -14,9 +16,20 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// Remplace la route existante par celle-ci :
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/membres', [MembreController::class, 'index'])->name('membres.index');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/membres', [MembreController::class, 'index'])->name('membres.index');
+    Route::get('/membres/creer', [MembreController::class, 'create'])->name('membres.create');
+    Route::post('/membres', [MembreController::class, 'store'])->name('membres.store');
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

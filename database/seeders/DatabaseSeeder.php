@@ -10,7 +10,10 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // 1. On lance d'abord le RoleSeeder pour créer les rôles en base
-        $this->call(RoleSeeder::class);
+        $this->call([
+            RoleSeeder::class,
+            MembreSeeder::class,
+        ]);
 
         // 2. On crée ton compte administrateur
         $user = User::factory()->create([
