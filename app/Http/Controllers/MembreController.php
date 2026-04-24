@@ -19,9 +19,9 @@ class MembreController extends Controller
 
         // Système de recherche et filtres
         if ($request->search) {
-            $query->where(function($q) use ($request) {
+            $query->where(function ($q) use ($request) {
                 $q->where('nom', 'like', "%{$request->search}%")
-                  ->orWhere('prenom', 'like', "%{$request->search}%");
+                    ->orWhere('prenom', 'like', "%{$request->search}%");
             });
         }
 
@@ -122,7 +122,7 @@ class MembreController extends Controller
     {
         $membres = Membre::all();
         $filename = "liste-membres-jpc.csv";
-        
+
         $headers = [
             "Content-type"        => "text/csv; charset=UTF-8",
             "Content-Disposition" => "attachment; filename=$filename",
@@ -133,9 +133,9 @@ class MembreController extends Controller
 
         $columns = ['Nom', 'Prenom', 'Sexe', 'Date Naissance', 'Etudes'];
 
-        $callback = function() use ($membres, $columns) {
+        $callback = function () use ($membres, $columns) {
             $file = fopen('php://output', 'w');
-            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF)); // BOM pour les accents
+            fprintf($file, chr(0xEF) . chr(0xBB) . chr(0xBF)); // BOM pour les accents
             fputcsv($file, $columns, ';');
 
             foreach ($membres as $m) {
@@ -150,13 +150,30 @@ class MembreController extends Controller
     /**
      * EXPORT PDF
      */
-    public function exportPdf()
+    public function exportPdf(Request $request)
     {
-        $membres = Membre::all();
-        
-        // On charge la vue Blade située dans resources/views/pdf/liste-membres.blade.php
+        $query = Membre::query();
+
+        // On applique les mêmes filtres que sur la page de liste
+        if ($request->search) {
+            $query->where(function ($q) use ($request) {
+                $q->where('nom', 'like', "%{$request->search}%")
+                    ->orWhere('prenom', 'like', "%{$request->search}%");
+            });
+        }
+
+        if ($request->sexe) {
+            $query->where('sexe', $request->sexe);
+        }
+
+        if ($request->niveau_etude) {
+            $query->where('niveau_etude', $request->niveau_etude);
+        }
+
+        $membres = $query->get();
+
         $pdf = Pdf::loadView('pdf.liste-membres', compact('membres'));
-        
-        return $pdf->download('liste-membres-jpc.pdf');
+
+        return $pdf->download('liste-membres-filtree.pdf');
     }
 }
