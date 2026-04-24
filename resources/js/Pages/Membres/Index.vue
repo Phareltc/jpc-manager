@@ -1,8 +1,15 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 
 defineProps({ membres: Array });
+
+const deleteMembre = (id) => {
+    if (confirm("Es-tu sûr de vouloir supprimer ce membre ? Cette action est irréversible.")) {
+        router.delete(route('membres.destroy', id));
+    }
+};
+
 </script>
 
 <template>
@@ -36,8 +43,18 @@ defineProps({ membres: Array });
                                 <td class="px-6 py-4 whitespace-nowrap">{{ membre.sexe }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap">{{ membre.niveau_etude }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right">
-                                    <button class="text-indigo-600 hover:text-indigo-900 mr-3">Modifier</button>
-                                    <button class="text-red-600 hover:text-red-900">Supprimer</button>
+                                    <Link 
+                                        :href="route('membres.edit', membre.id)" 
+                                        class="text-indigo-600 hover:text-indigo-900 mr-3"
+                                    >
+                                        Modifier
+                                    </Link>
+                                    <button 
+                                        @click="deleteMembre(membre.id)"
+                                        class="text-red-600 hover:text-red-900 font-medium"
+                                    >
+                                        Supprimer
+                                    </button>
                                 </td>
                             </tr>
                         </tbody>

@@ -47,4 +47,46 @@ class MembreController extends Controller
 
         return redirect()->route('membres.index');
     }
+
+    public function edit(Membre $membre)
+    {
+        // On formate la date pour l'input HTML5 (YYYY-MM-DD)
+        $membre->date_naissance = \Carbon\Carbon::parse($membre->date_naissance)->format('Y-m-d');
+
+        if ($membre->date_bapteme) {
+            $membre->date_bapteme = \Carbon\Carbon::parse($membre->date_bapteme)->format('Y-m-d');
+        }
+
+        return Inertia::render('Membres/Edit', [
+            'membre' => $membre
+        ]);
+    }
+
+    public function update(Request $request, Membre $membre)
+    {
+        $validated = $request->validate([
+            'nom' => 'required|string|max:255',
+            'prenom' => 'required|string|max:255',
+            'sexe' => 'required|in:M,F',
+            'date_naissance' => 'required|date',
+            'date_bapteme' => 'nullable|date',
+            'telephone' => 'nullable|string|max:20',
+            'niveau_etude' => 'required|string',
+            'statut_professionnel' => 'required|string',
+            'role_spirituel' => 'required|string',
+            'statut_matrimonial' => 'required|string',
+            'structure_mouvement' => 'nullable|string',
+        ]);
+
+        $membre->update($validated);
+
+        return redirect()->route('membres.index')->with('message', 'Membre mis à jour !');
+    }
+
+    public function destroy(Membre $membre)
+    {
+        $membre->delete();
+
+        return redirect()->route('membres.index')->with('message', 'Membre supprimé avec succès.');
+    }
 }
