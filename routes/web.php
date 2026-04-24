@@ -31,6 +31,7 @@ Route::middleware(['auth'])->group(function () {
     
     // ON PLACE L'EXPORT ICI (Avant le paramètre dynamique {membre})
     Route::get('/membres/export', [MembreController::class, 'export'])->name('membres.export');
+    Route::get('/membres/export-pdf', [MembreController::class, 'exportPdf'])->name('membres.export.pdf');
 
     Route::post('/membres', [MembreController::class, 'store'])->name('membres.store');
     Route::get('/membres/{membre}/modifier', [MembreController::class, 'edit'])->name('membres.edit');
