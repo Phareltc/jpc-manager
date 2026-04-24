@@ -2,21 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Membre;
+use App\Models\Membre; // IMPORTANT : pour accéder à la table membres
 use Inertia\Inertia;
-use Inertia\Response;
+use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    public function index(): Response
+    public function index()
     {
+        $now = now();
+        
         return Inertia::render('Dashboard', [
             'stats' => [
                 'total_membres' => Membre::count(),
                 'hommes' => Membre::where('sexe', 'M')->count(),
                 'femmes' => Membre::where('sexe', 'F')->count(),
-                // On pourra ajouter ici la répartition par niveau d'étude plus tard
-            ]
+            ],
+            'anniversaires' => Membre::whereMonth('date_naissance', $now->month)
+                ->orderByRaw('DAY(date_naissance) ASC')
+                ->get(),
+            'recents' => Membre::latest()->take(5)->get(),
         ]);
     }
 }

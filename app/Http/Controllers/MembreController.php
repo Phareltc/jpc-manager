@@ -127,4 +127,12 @@ class MembreController extends Controller
 
         return redirect()->route('membres.index')->with('danger', 'Le membre a été supprimé de la base de données.');
     }
+
+    public function export()
+{
+    $membres = Membre::all();
+    $csvExporter = new \App\Services\CsvExporter(); // On va créer ce petit service
+    
+    return $csvExporter->download($membres, 'liste-membres-jpc.csv');
+}
 }
