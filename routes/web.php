@@ -32,6 +32,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/membres/{membre}/modifier', [MembreController::class, 'edit'])->name('membres.edit');
     Route::put('/membres/{membre}', [MembreController::class, 'update'])->name('membres.update');
     Route::delete('/membres/{membre}', [MembreController::class, 'destroy'])->name('membres.destroy');
+    Route::get('/membres/{membre}', [MembreController::class, 'show'])->name('membres.show');
 });
 
 Route::middleware('auth')->group(function () {

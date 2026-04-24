@@ -10,10 +10,26 @@ use Inertia\Inertia;
 
 class MembreController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         return Inertia::render('Membres/Index', [
-            'membres' => Membre::latest()->get()
+            // On récupère les membres en filtrant par nom ou prénom si une recherche existe
+            'membres' => Membre::query()
+                ->when($request->input('search'), function ($query, $search) {
+                    $query->where('nom', 'like', "%{$search}%")
+                        ->orWhere('prenom', 'like', "%{$search}%");
+                })
+                ->latest()
+                ->get(),
+            // On renvoie la valeur de recherche pour la réafficher dans l'input
+            'filters' => $request->only(['search'])
+        ]);
+    }
+
+    public function show(Membre $membre)
+    {
+        return Inertia::render('Membres/Show', [
+            'membre' => $membre
         ]);
     }
 
