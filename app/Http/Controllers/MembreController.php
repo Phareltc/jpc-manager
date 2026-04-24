@@ -12,17 +12,40 @@ class MembreController extends Controller
 {
     public function index(Request $request)
     {
+        // On commence la requête
+        $query = Membre::query();
+
+        // 1. Filtre de recherche textuelle (Nom/Prénom)
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('nom', 'like', "%{$request->search}%")
+                    ->orWhere('prenom', 'like', "%{$request->search}%");
+            });
+        }
+
+        // 2. Filtres exacts (Sexe, Niveau d'étude, Statut Matrimonial)
+        if ($request->filled('sexe')) {
+            $query->where('sexe', $request->sexe);
+        }
+
+        if ($request->filled('niveau_etude')) {
+            $query->where('niveau_etude', $request->niveau_etude);
+        }
+
+        if ($request->filled('statut_matrimonial')) {
+            $query->where('statut_matrimonial', $request->statut_matrimonial);
+        }
+
+        // 3. Filtre de date exacte
+        if ($request->filled('date_naissance')) {
+            $query->whereDate('date_naissance', $request->date_naissance);
+        }
+
         return Inertia::render('Membres/Index', [
-            // On récupère les membres en filtrant par nom ou prénom si une recherche existe
-            'membres' => Membre::query()
-                ->when($request->input('search'), function ($query, $search) {
-                    $query->where('nom', 'like', "%{$search}%")
-                        ->orWhere('prenom', 'like', "%{$search}%");
-                })
-                ->latest()
-                ->get(),
-            // On renvoie la valeur de recherche pour la réafficher dans l'input
-            'filters' => $request->only(['search'])
+            // On récupère les résultats filtrés
+            'membres' => $query->latest()->get(),
+            // On renvoie les filtres au frontend pour que les champs restent remplis
+            'filters' => $request->only(['search', 'sexe', 'niveau_etude', 'statut_matrimonial', 'date_naissance']),
         ]);
     }
 
