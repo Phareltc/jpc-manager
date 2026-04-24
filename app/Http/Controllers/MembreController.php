@@ -39,13 +39,12 @@ class MembreController extends Controller
             'statut_professionnel' => 'required|string',
             'role_spirituel' => 'required|string',
             'statut_matrimonial' => 'required|string',
-            // N'oublie pas celui-ci s'il est requis en base !
             'structure_mouvement' => 'nullable|string',
         ]);
 
         Membre::create($validated);
 
-        return redirect()->route('membres.index');
+        return redirect()->route('membres.index')->with('success', 'Nouveau membre ajouté avec succès !');
     }
 
     public function edit(Membre $membre)
@@ -80,13 +79,13 @@ class MembreController extends Controller
 
         $membre->update($validated);
 
-        return redirect()->route('membres.index')->with('message', 'Membre mis à jour !');
+        return redirect()->route('membres.index')->with('warning', 'Les informations du membre ont été modifiées.');
     }
 
     public function destroy(Membre $membre)
     {
         $membre->delete();
 
-        return redirect()->route('membres.index')->with('message', 'Membre supprimé avec succès.');
+        return redirect()->route('membres.index')->with('danger', 'Le membre a été supprimé de la base de données.');
     }
 }
