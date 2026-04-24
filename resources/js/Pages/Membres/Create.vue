@@ -5,15 +5,15 @@ import { Head, useForm } from '@inertiajs/vue3';
 const form = useForm({
     nom: '',
     prenom: '',
-    sexe: 'M', // Valeur par défaut
+    sexe: 'M',
     date_naissance: '',
-    date_bapteme: null, // Plus propre pour une date vide
+    date_bapteme: '', // Initialisé à vide pour le champ date
     telephone: '',
-    niveau_etude: 'Université', // Valeur par défaut
+    niveau_etude: 'Université',
     statut_professionnel: '',
-    role_spirituel: 'Membre', // On donne une valeur par défaut pour tester
-    statut_matrimonial: 'Célibataire', // Valeur par défaut
-    structure_mouvement: 'JPC', // AJOUTE CE CHAMP qui est dans ton modèle !
+    role_spirituel: 'Membre',
+    statut_matrimonial: 'Célibataire',
+    structure_mouvement: 'JPC',
 });
 
 const submit = () => {
@@ -30,13 +30,20 @@ const submit = () => {
         </template>
 
         <div class="py-12">
-            <div class="mx-auto max-w-4xl sm:px-6 lg:px-8">
-                <div class="bg-white p-6 shadow-sm sm:rounded-lg">
+            <div class="mx-auto max-w-5xl sm:px-6 lg:px-8">
+                <div class="bg-white p-6 shadow-sm sm:rounded-lg border border-gray-200">
                     <form @submit.prevent="submit" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        
+                        <div class="md:col-span-2 border-b pb-2">
+                            <h3 class="text-lg font-medium text-gray-900">Identification</h3>
+                        </div>
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Nom</label>
                             <input v-model="form.nom" type="text" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
+                            <div v-if="form.errors.nom" class="text-red-500 text-xs mt-1">{{ form.errors.nom }}</div>
                         </div>
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Prénom</label>
                             <input v-model="form.prenom" type="text" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
@@ -49,9 +56,29 @@ const submit = () => {
                                 <option value="F">Féminin</option>
                             </select>
                         </div>
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Date de naissance</label>
                             <input v-model="form.date_naissance" type="date" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Téléphone</label>
+                            <input v-model="form.telephone" type="text" placeholder="Ex: +241..." class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Statut Matrimonial</label>
+                            <select v-model="form.statut_matrimonial" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
+                                <option value="Célibataire">Célibataire</option>
+                                <option value="Marié(e)">Marié(e)</option>
+                                <option value="Divorcé(e)">Divorcé(e)</option>
+                                <option value="Veuf(ve)">Veuf(ve)</option>
+                            </select>
+                        </div>
+
+                        <div class="md:col-span-2 border-b pb-2 mt-4">
+                            <h3 class="text-lg font-medium text-gray-900">Parcours & Engagement</h3>
                         </div>
 
                         <div>
@@ -63,38 +90,44 @@ const submit = () => {
                                 <option value="Aucun">Aucun</option>
                             </select>
                         </div>
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Statut Professionnel</label>
-                            <input v-model="form.statut_professionnel" type="text" placeholder="Ex: Étudiant, Employé..." class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                            <input v-model="form.statut_professionnel" type="text" placeholder="Ex: Étudiant, Agent Public..." class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
                         </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Structure / Mouvement</label>
+                            <input v-model="form.structure_mouvement" type="text" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                        </div>
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Rôle Spirituel</label>
                             <select v-model="form.role_spirituel" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
-                                <option value="">Sélectionnez un rôle</option>
                                 <option value="Membre">Membre</option>
                                 <option value="Responsable">Responsable</option>
                                 <option value="Ancien">Ancien</option>
                             </select>
-                            <div v-if="form.errors.role_spirituel" class="text-red-500 text-xs mt-1">{{ form.errors.role_spirituel }}</div>
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700">Statut Matrimonial</label>
-                            <select v-model="form.statut_matrimonial" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
-                                <option value="Célibataire">Célibataire</option>
-                                <option value="Marié(e)">Marié(e)</option>
-                            </select>
+                            <label class="block text-sm font-medium text-gray-700">Date de Baptême (si applicable)</label>
+                            <input v-model="form.date_bapteme" type="date" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
                         </div>
-                        <div class="md:col-span-2">
-                            <button type="submit" :disabled="form.processing" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">
-                                Enregistrer le membre
+
+                        <div class="md:col-span-2 mt-6">
+                            <button 
+                                type="submit" 
+                                :disabled="form.processing" 
+                                class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 transition duration-200 shadow-md disabled:opacity-50"
+                            >
+                                <span v-if="form.processing">Traitement en cours...</span>
+                                <span v-else>Enregistrer le membre</span>
                             </button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
-
-        
     </AuthenticatedLayout>
 </template>
