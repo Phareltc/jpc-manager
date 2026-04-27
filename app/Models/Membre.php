@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Scolarite;
 
 class Membre extends Model
 {
@@ -19,4 +20,10 @@ class Membre extends Model
         'structure_mouvement',
         'statut_matrimonial'
     ];
+
+    // Dans app/Models/Membre.php
+    public function scolarites()
+    {
+        return $this->hasMany(Scolarite::class);
+    }
 }

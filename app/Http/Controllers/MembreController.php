@@ -72,7 +72,10 @@ class MembreController extends Controller
     public function show(Membre $membre)
     {
         return Inertia::render('Membres/Show', [
-            'membre' => $membre
+            // On charge les scolarités triées par année la plus récente
+            'membre' => $membre->load(['scolarites' => function ($query) {
+                $query->orderBy('annee_scolaire', 'desc');
+            }])
         ]);
     }
 

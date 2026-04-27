@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MembreController;
+use App\Http\Controllers\ScolariteController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -39,6 +40,8 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/membres/{membre}', [MembreController::class, 'destroy'])->name('membres.destroy');
     Route::get('/membres/{membre}', [MembreController::class, 'show'])->name('membres.show');
 });
+
+Route::post('/scolarites', [ScolariteController::class, 'store'])->name('scolarites.store');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
