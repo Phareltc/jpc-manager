@@ -10,13 +10,12 @@ class Scolarite extends Model
     use HasFactory;
 
     protected $fillable = [
-        'membre_id', 
-        'annee_scolaire', 
-        'etablissement', 
-        'classe', 
-        'serie', 
-        'decision_finale'
-    ];
+    'membre_id', 
+    'annee_academique', // Vérifie bien l'orthographe ici
+    'etablissement', 
+    'niveau_etude', 
+    'resultat'
+];
 
     /**
      * Relation Inverse : Une scolarité appartient à un seul membre. 

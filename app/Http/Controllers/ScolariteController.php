@@ -29,14 +29,13 @@ class ScolariteController extends Controller
     /**
      * Enregistre une nouvelle scolarité pour un membre.
      */
-    public function store(StoreScolariteRequest $request): RedirectResponse
+    public function store(StoreScolariteRequest $request)
     {
-        // Les données sont déjà validées ici grâce à StoreScolariteRequest
-        Scolarite::create($request->validated());
+        // Ajoute cette ligne pour stopper l'exécution et voir les données
+        //dd($request->all());
 
-        // On redirige vers la page précédente avec un message de succès
-        // Inertia interceptera cela pour mettre à jour les données sans recharger la page
-        return back()->with('message', 'Scolarité ajoutée avec succès !');
+        Scolarite::create($request->validated());
+        return back();
     }
 
     /**

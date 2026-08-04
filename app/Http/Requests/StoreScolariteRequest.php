@@ -19,11 +19,10 @@ class StoreScolariteRequest extends FormRequest
     {
         return [
             'membre_id' => 'required|exists:membres,id',
-            'annee_scolaire' => 'required|string|max:20', // ex: 2025-2026
-            'etablissement' => 'required|string|max:255',
-            'classe' => 'required|string|max:100',
-            'serie' => 'nullable|string|max:50',
-            'decision_finale' => 'nullable|string|max:100',
+            'annee_academique' => 'required|string|max:20', // Harmonisé avec la migration
+            'etablissement'    => 'required|string|max:255',
+            'niveau_etude'     => 'required|string|max:100', // Harmonisé avec la migration
+            'resultat'         => 'required|in:Admis,Échec,En cours',
         ];
     }
 }
