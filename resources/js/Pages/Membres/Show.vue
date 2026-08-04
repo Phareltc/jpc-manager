@@ -1,17 +1,22 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head, Link, useForm } from '@inertiajs/vue3'; // Ajout de useForm
-import { ref } from 'vue'; // Ajout de ref pour la modale
-import Modal from '@/Components/Modal.vue'; // Import du composant Modale de Breeze
+import { Head, Link, useForm } from '@inertiajs/vue3';
+import { ref } from 'vue';
+import Modal from '@/Components/Modal.vue';
 
 const props = defineProps({ 
     membre: Object 
 });
 
-// Logique pour la modale
+// Modale Formulaire (Ajout / Édition)
 const showModal = ref(false);
+const isEditing = ref(false);
+const editingScolariteId = ref(null);
 
-// Formulaire réactif pour la scolarité
+// Modale Confirmation de Suppression
+const showDeleteModal = ref(false);
+const scolariteToDeleteId = ref(null);
+
 const form = useForm({
     membre_id: props.membre.id,
     annee_academique: '',
@@ -20,13 +25,63 @@ const form = useForm({
     resultat: 'En cours',
 });
 
+// Ouvrir la modale d'ajout
+const openCreateModal = () => {
+    isEditing.value = false;
+    editingScolariteId.value = null;
+    form.reset();
+    form.membre_id = props.membre.id;
+    form.resultat = 'En cours';
+    showModal.value = true;
+};
+
+// Ouvrir la modale d'édition
+const openEditModal = (scolarite) => {
+    isEditing.value = true;
+    editingScolariteId.value = scolarite.id;
+    form.membre_id = props.membre.id;
+    form.annee_academique = scolarite.annee_academique;
+    form.etablissement = scolarite.etablissement;
+    form.niveau_etude = scolarite.niveau_etude;
+    form.resultat = scolarite.resultat;
+    showModal.value = true;
+};
+
+// Soumettre le formulaire (Ajout ou Modification)
 const submitScolarite = () => {
-    form.post(route('scolarites.store'), {
-        onSuccess: () => {
-            showModal.value = false;
-            form.reset('annee_academique', 'etablissement', 'niveau_etude', 'resultat');
-        },
-    });
+    if (isEditing.value) {
+        form.put(route('scolarites.update', editingScolariteId.value), {
+            onSuccess: () => {
+                showModal.value = false;
+                form.reset();
+            },
+        });
+    } else {
+        form.post(route('scolarites.store'), {
+            onSuccess: () => {
+                showModal.value = false;
+                form.reset();
+            },
+        });
+    }
+};
+
+// Ouvrir la modale de confirmation de suppression
+const confirmDeleteScolarite = (scolariteId) => {
+    scolariteToDeleteId.value = scolariteId;
+    showDeleteModal.value = true;
+};
+
+// Executer la suppression après confirmation
+const deleteScolarite = () => {
+    if (scolariteToDeleteId.value) {
+        form.delete(route('scolarites.destroy', scolariteToDeleteId.value), {
+            onSuccess: () => {
+                showDeleteModal.value = false;
+                scolariteToDeleteId.value = null;
+            },
+        });
+    }
 };
 </script>
 
@@ -46,6 +101,7 @@ const submitScolarite = () => {
         <div class="py-12">
             <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-6">
                 
+                <!-- BLOC 1 : INFOS PERSONNELLES -->
                 <div class="bg-white shadow overflow-hidden sm:rounded-lg">
                     <div class="px-4 py-5 sm:px-6 bg-blue-600 flex justify-between items-center">
                         <div>
@@ -69,18 +125,16 @@ const submitScolarite = () => {
                     </div>
                 </div>
 
+                <!-- BLOC 2 : HISTORIQUE SCOLAIRE -->
                 <div class="bg-white shadow sm:rounded-lg p-6">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-lg font-bold text-gray-800">Trajectoire Académique</h3>
-                        <button @click="showModal = true" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow text-sm font-bold uppercase transition">
+                        <button @click="openCreateModal" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow text-sm font-bold uppercase transition">
                             + Ajouter une année
                         </button>
                     </div>
 
-                    <!-- <div v-if="form.errors" class="text-red-600 text-sm">
-                        {{ form.errors }}
-                    </div> -->
-
+                    <!-- Tableau des données -->
                     <div v-if="membre.scolarites && membre.scolarites.length > 0" class="overflow-hidden border border-gray-100 rounded-lg">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
@@ -89,6 +143,7 @@ const submitScolarite = () => {
                                     <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Établissement</th>
                                     <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Niveau</th>
                                     <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Résultat</th>
+                                    <th class="px-6 py-3 text-right text-xs font-bold text-gray-500 uppercase">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
@@ -103,6 +158,14 @@ const submitScolarite = () => {
                                             'text-blue-600': scolarite.resultat === 'En cours'
                                         }">{{ scolarite.resultat }}</span>
                                     </td>
+                                    <td class="px-6 py-4 text-sm text-right space-x-2">
+                                        <button @click="openEditModal(scolarite)" class="text-indigo-600 hover:text-indigo-900 font-bold">
+                                            Éditer
+                                        </button>
+                                        <button @click="confirmDeleteScolarite(scolarite.id)" class="text-red-600 hover:text-red-900 font-bold">
+                                            Supprimer
+                                        </button>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -115,9 +178,12 @@ const submitScolarite = () => {
             </div>
         </div>
 
+        <!-- MODALE 1 : FORMULAIRE (AJOUT / ÉDITION) -->
         <Modal :show="showModal" @close="showModal = false">
             <form @submit.prevent="submitScolarite" class="p-6">
-                <h2 class="text-xl font-bold text-gray-900 mb-6 border-b pb-2">Nouveau suivi scolaire</h2>
+                <h2 class="text-xl font-bold text-gray-900 mb-6 border-b pb-2">
+                    {{ isEditing ? 'Modifier la scolarité' : 'Nouveau suivi scolaire' }}
+                </h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="col-span-2 md:col-span-1">
@@ -145,10 +211,35 @@ const submitScolarite = () => {
                 <div class="mt-8 flex justify-end gap-3">
                     <button type="button" @click="showModal = false" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md font-bold">Annuler</button>
                     <button type="submit" :disabled="form.processing" class="px-4 py-2 bg-blue-600 text-white rounded-md font-bold hover:bg-blue-700">
-                        {{ form.processing ? 'Enregistrement...' : 'Enregistrer les données' }}
+                        {{ form.processing ? 'Traitement...' : (isEditing ? 'Mettre à jour' : 'Enregistrer') }}
                     </button>
                 </div>
             </form>
         </Modal>
+
+        <!-- MODALE 2 : CONFIRMATION DE SUPPRESSION -->
+        <Modal :show="showDeleteModal" @close="showDeleteModal = false">
+            <div class="p-6">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="flex-shrink-0 w-12 h-12 rounded-full bg-red-100 flex items-center justify-center text-red-600 font-bold text-xl">
+                        ⚠️
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-900">Confirmer la suppression</h3>
+                        <p class="text-sm text-gray-500">Es-tu sûr de vouloir supprimer cette ligne d'historique scolaire ? Cette action est irréversible.</p>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex justify-end gap-3">
+                    <button type="button" @click="showDeleteModal = false" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md font-bold hover:bg-gray-200 transition">
+                        Annuler
+                    </button>
+                    <button type="button" @click="deleteScolarite" :disabled="form.processing" class="px-4 py-2 bg-red-600 text-white rounded-md font-bold hover:bg-red-700 transition">
+                        {{ form.processing ? 'Suppression...' : 'Oui, supprimer' }}
+                    </button>
+                </div>
+            </div>
+        </Modal>
+
     </AuthenticatedLayout>
 </template>

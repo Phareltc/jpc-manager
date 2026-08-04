@@ -31,7 +31,7 @@ class ScolariteController extends Controller
      */
     public function store(StoreScolariteRequest $request)
     {
-        // Ajoute cette ligne pour stopper l'exécution et voir les données
+        // Cette ligne stoppe l'exécution et permet de voir les données
         //dd($request->all());
 
         Scolarite::create($request->validated());
@@ -57,16 +57,19 @@ class ScolariteController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Scolarite $scolarite)
+    public function update(StoreScolariteRequest $request, Scolarite $scolarite)
     {
-        //
+        $scolarite->update($request->validated());
+        return back();
     }
+
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(Scolarite $scolarite)
     {
-        //
+        $scolarite->delete();
+        return back();
     }
 }

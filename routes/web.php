@@ -42,6 +42,9 @@ Route::middleware(['auth'])->group(function () {
 
     // Route Scolarité sécurisée
     Route::post('/scolarites', [ScolariteController::class, 'store'])->name('scolarites.store');
+    Route::post('/scolarites', [ScolariteController::class, 'store'])->name('scolarites.store');
+    Route::put('/scolarites/{scolarite}', [ScolariteController::class, 'update'])->name('scolarites.update');
+    Route::delete('/scolarites/{scolarite}', [ScolariteController::class, 'destroy'])->name('scolarites.destroy');
 });
 
 Route::post('/scolarites', [ScolariteController::class, 'store'])->name('scolarites.store');
