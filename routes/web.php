@@ -7,6 +7,8 @@ use Inertia\Inertia;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MembreController;
 use App\Http\Controllers\ScolariteController;
+use App\Http\Controllers\ContributionController;
+use App\Http\Controllers\TypeContributionController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -45,6 +47,18 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/scolarites', [ScolariteController::class, 'store'])->name('scolarites.store');
     Route::put('/scolarites/{scolarite}', [ScolariteController::class, 'update'])->name('scolarites.update');
     Route::delete('/scolarites/{scolarite}', [ScolariteController::class, 'destroy'])->name('scolarites.destroy');
+
+    // Route pour la liste globale la gestion des contributions
+    Route::get('/contributions', [ContributionController::class, 'index'])->name('contributions.index');
+    Route::post('/contributions', [ContributionController::class, 'store'])->name('contributions.store');
+    Route::put('/contributions/{contribution}', [ContributionController::class, 'update'])->name('contributions.update');
+    Route::delete('/contributions/{contribution}', [ContributionController::class, 'destroy'])->name('contributions.destroy');
+
+    // Gestion des types de contributions / projets
+    // Types de contributions
+    Route::post('/type-contributions', [TypeContributionController::class, 'store'])->name('type-contributions.store');
+    Route::put('/type-contributions/{typeContribution}', [TypeContributionController::class, 'update'])->name('type-contributions.update');
+    Route::delete('/type-contributions/{typeContribution}', [TypeContributionController::class, 'destroy'])->name('type-contributions.destroy');
 });
 
 Route::post('/scolarites', [ScolariteController::class, 'store'])->name('scolarites.store');

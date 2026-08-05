@@ -3,26 +3,28 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-// Ces deux lignes sont cruciales pour que Spatie fonctionne :
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\PermissionRegistrar;
 
 class RoleSeeder extends Seeder
 {
     public function run(): void
     {
-        // Nettoyer le cache des permissions (très important avec Spatie)
-        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        // 1. Reinitialiser le cache des permissions (Indispensable)
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // Création des rôles
-        $admin = Role::create(['name' => 'admin']);
-        $responsable = Role::create(['name' => 'responsable']);
+        // 2. Création ou récupération des permissions
+        $permSupprimerMembres = Permission::firstOrCreate(['name' => 'supprimer membres', 'guard_name' => 'web']);
+        $permEditerStats = Permission::firstOrCreate(['name' => 'editer statistiques', 'guard_name' => 'web']);
 
-        // Création de permissions
-        Permission::create(['name' => 'supprimer membres']);
-        Permission::create(['name' => 'editer statistiques']);
+        // 3. Création ou récupération des rôles
+        $admin = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
+        $responsable = Role::firstOrCreate(['name' => 'responsable', 'guard_name' => 'web']);
 
-        // L'admin a tous les droits
-        $admin->givePermissionTo(Permission::all());
+        // 4. Synchronisation des permissions
+        // syncPermissions s'assure de lier toutes les permissions sans faire de doublons
+        $admin->syncPermissions(Permission::all());
+        $responsable->syncPermissions([$permEditerStats]);
     }
 }

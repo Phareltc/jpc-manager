@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Scolarite;
+use App\Models\Contribution;
 
 class Membre extends Model
 {
@@ -25,5 +26,10 @@ class Membre extends Model
     public function scolarites()
     {
         return $this->hasMany(Scolarite::class);
+    }
+
+    public function contributions()
+    {
+        return $this->hasMany(Contribution::class)->orderBy('date_paiement', 'desc');
     }
 }

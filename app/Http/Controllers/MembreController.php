@@ -71,6 +71,9 @@ class MembreController extends Controller
      */
     public function show(Membre $membre)
     {
+        // Charger les scolarités et les contributions du membre
+        $membre->load(['scolarites', 'contributions']);
+
         return Inertia::render('Membres/Show', [
             // On remplace 'annee_scolaire' par 'annee_academique' pour correspondre à ta table SQL
             'membre' => $membre->load(['scolarites' => function ($query) {
